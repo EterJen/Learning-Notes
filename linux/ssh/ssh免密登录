@@ -1,0 +1,5 @@
+ 1038  cd /home/eter/.ssh/
+ 1042  ssh-keygen -t rsa
+ 1046  cat id_rsa.pub >> authorized_keys
+ 1052  scp authorized_keys root@172.17.12.5:/home/eter/.ssh #第一次直接复制 后面需追加
+ 1053  ssh -p 22 root@172.17.12.5

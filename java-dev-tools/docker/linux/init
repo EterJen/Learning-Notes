@@ -1,0 +1,29 @@
+查找nexus3镜像
+docker search nexus3
+拉取nexus3镜像
+docker pull docker.io/sonatype/nexus3
+查看镜像
+docker images
+运行nexus容器
+docker run -id --privileged=true --name=nexus3 --restart=always -p 8081:8081 -v /kichun/nexus3/nexus-data:/var/nexus-data 6e9721ad473a（这个是镜像id或名称）
+docker run -id --privileged=true  --name nexus3 --restart=always -p 8081:8081 -v /opt/nexus-data:/nexus3 sonatype/nexus3
+docker run -id --privileged=true  --name nexus3 --restart=always -p 8081:8081 -v /opt/nexus-data:/var/nexus-data sonatype/nexus3
+
+解释：
+-id 创建守护式容器
+--privileged=true 授予root权限（挂载多级目录必须为true，否则容器访问宿主机权限不足）
+--name=名字 给你的容器起个名字
+-p 宿主机端口：容器端口映射
+-v 宿主机目录：容器目录 目录挂载
+
+开放端口
+开端口命令：firewall-cmd --zone=public --add-port=8081/tcp --permanent;
+重启防火墙：systemctl restart firewalld.service;
+
+访问
+http://ip:8081  
+登录
+默认admin密码admin123
+
+初始登录密码就在‘’admin.password’文件里面
+find / -name 'admin.password'
