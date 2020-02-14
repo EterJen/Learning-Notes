@@ -1,0 +1,7 @@
+如何修改序列(Sequence)的初始值
+  
+          2.1 执行:Alter Sequence SeqTest2010_S Increment By 1007;
+
+            2.2 执行:Select SeqTest2010_S.NextVal From Dual;
+
+            2.3 执行:Alter Sequence SeqTest2010_S Increment By 1;
