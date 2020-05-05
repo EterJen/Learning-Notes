@@ -1,0 +1,188 @@
+一、下载MySQL免安装版
+ • 首先进入MySQL 官方网站 www.mysql.com  -->Downloads（下载） --> Community(社区) --> MySQL Community Server(MySQL社区服务器)-->选择操作系统平台（Windows）
+• 下面有三个可选的下载文件
+† 第一个是MySQL Installer 5.6 for Windows，下载下来是一个.msi可执行安装文件
+† 后面两个是解压版（Zip版）分别是Windows (x86, 64-bit) ZIP Archive 和 Windows (x86, 32-bit), ZIP Archive
+ • 笔者选择的是 mysql-5.6.26-winx64.zip ，因为笔者的服务器版本是64位操作系统 
+
+二、配置MySQL数据库
+ • 将下载的 mysql-5.6.26-winx64.zip 解压自定义目录，这里笔者将把这个压缩包解压至 D:\mysql-5_x64 目录;
+• 打开这个目录，发现里面的文件夹和文件跟一个安装好后的MySQL基本没有区别
+• 修改MySQL配置文件，在mysql-5_x64目录下有一个my-default.ini，可以算作模板来使用，里面的内容不是很多！可以自己创建一个 my.ini作为MySQL配置文件，打开my.ini 
+
+[client] 
+port=3306 
+#客户端字符类型，与服务端一致就行，建议utf8 
+default-character-set=utf8 
+[mysqld]
+ #绑定IPv4和3306端口
+ bind-address = 0.0.0.0
+ port = 3306 
+#服务端字符类型，建议utf8 
+character_set_server=utf8 
+# 设置mysql的安装目录
+ basedir=D:/mysql-5_x64
+ # 设置mysql数据库的数据的存放目录
+ datadir=D:/mysql-5_x64/data
+ # 允许最大连接数
+ max_connections=201 
+ • 这样一个基本的MySQL环境所需要的参数就够了 
+三、MySQL环境变量
+ • 右击这台电脑-->属性-->高级-->环境变量-->"用户变量"新建变量MYSQL_HOME 值D:\mysql-5_x64 ,"系统变量"找到变量path 编辑 在后面加上  ;%MYSQL_HOME%\bin 
+四、安装MySQL数据库
+ •  运行cmd （Win8 、Win10以管理员运行cmd）-->进入D:\mysql-5_x64\bin目录
+Microsoft Windows [版本 10.0.10240] 
+(c) 2015 Microsoft Corporation. All rights reserved.
+C:\Windows\system32>D:
+D:\>cd mysql-5_x64
+D:\mysql-5_x64>cd bin
+D:\mysql-5_x64\bin> 
+• 执行mysqld -install 安装MySQL 
+D:\mysql-5_x64\bin>mysqld -install 
+Service successfully installed 
+•  执行net start mysql启动MySQL
+
+D:\mysql-5_x64\bin>net start mysql
+D:\mysql-5_x64\bin>net start mysql
+MySQL 服务正在启动 . 
+MySQL 服务已经启动成功
+启动MySQL服务：net start mysql
+停止MySQL服务：net stop mysql
+删除MySQL服务：sc delete mysql
+
+• 修改Mysql密码
+
+D:\mysql-5_x64\bin>mysql -u root -p                              //使用root登入mysql 
+Enter password:                                                 //密码空，回车即可 
+Welcome to the MySQL monitor.  Commands end with ; or \g. 
+Your MySQL connection id is 2 
+Server version: 5.6.26 MySQL Community Server (GPL)
+Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
+Oracle is a registered trademark of Oracle Corporation and/or its 
+affiliates. Other names may be trademarks of their respective 
+owners.
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>
+?
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+mysql> show databases; //显示所有数据库
++--------------------+ 
+| Database |
++--------------------+ 
+| information_schema | 
+| mysql | 
+| performance_schema | 
+| test | 
++--------------------+ 
+4 rows in set (0.00 sec) 
+• 进入'mysql'数据、删除空用户
+?
+1
+2
+3
+4
+mysql> use mysql; 
+Database changed 
+mysql> delete from user where user=''; 
+Query OK, 1 row affected (0.00 sec) 
+• 更新密码并重新刷权限表到内存(也可以用mysqladmin工具来设置密码)
+?
+1
+2
+3
+4
+5
+mysql> update User set Password=PASSWORD('123') where User='root';
+Query OK, 4 rows affected (0.00 sec) 
+Rows matched: 4 Changed: 4 Warnings: 0 
+mysql> flush privileges; 
+Query OK, 0 rows affected (0.00 sec) 
+• 尝试登陆
+?
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+D:\mysql-5_x64\bin>mysql -u root -p //用root用户登入数据库 
+Enter password: ******  //输入更新后的密码 123456 
+Welcome to the MySQL monitor. Commands end with ; or \g. 
+Your MySQL connection id is 5 
+Server version: 5.6.26 MySQL Community Server (GPL) 
+Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved. 
+Oracle is a registered trademark of Oracle Corporation and/or its 
+affiliates. Other names may be trademarks of their respective 
+owners. 
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement. 
+mysql> 
+• 开启远程连接（给予全部权限，允许 192.168.1.x 网段都可以连接）
+?
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+mysql> grant all privileges on *.* to 'root'@'192.168.1.%' identified by 'root' with grant option; 
+Query OK, 0 rows affected (0.00 sec) 
+mysql> flush privileges; 
+Query OK, 0 rows affected (0.00 sec) 
+mysql> select host,user,password from user;
++-------------+------+-------------------------------------------+
+| host | user | password  |
++-------------+------+-------------------------------------------+
+| 192.168.1.% | root | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |
++-------------+------+-------------------------------------------+
+4 rows in set (0.00 sec) 
+
+
+MySQL解决外网不能连接
+2018-11-02 15:52:00 SimpleWu。 阅读数 1036更多
+分类专栏： # MySQL数据库
+版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
+本文链接：https://blog.csdn.net/qq_42280739/article/details/83828648
+MySQL解决外网不能连接
+Author:SimpleWu
+
+或许有些时候会遇到通过ip地址访问项目的数据库，可是访问失败了。
+
+现在给大家一种解决方案：
+
+ 
+#进入mysql数据库
+USE mysql;
+ 
+#查询用户
+SELECT HOST,USER,PASSWORD FROM USER;
+可以看到user为root，host为localhost的话，
+说明mysql只允许本机连接，那么外网，本地软件客户端就无法连接了。
+
+ 
+#调整方法：
+#执行：
+update user set host='%' where user ='root';
+ 
+#执行刷新权限：
+flush privileges;
+可以测试外网连接mysql服务器。

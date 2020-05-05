@@ -1,0 +1,23 @@
+进入命令窗口（Win + R），连接数据库 mysql -hlocalhost -uroot -p，回车，输入密码，回车，如图：
+
+继续输入 show variables like'%time_zone';    （注意不要漏掉后面的分号），回车，如图：
+显示 SYSTEM 就是没有设置时区啦。
+
+输入set global time_zone = '+8:00';  注意不要漏掉后面的分号），回车，如图：
+
+
+
+这便是设置成功啦！
+
+这时你重新连接下数据库，也许能连接成功！如果没有，就继续往下走！
+
+第二，同步mysql驱动。
+我本机安装的mysql版本是5.7的，那么IDEA要连接mysql也应该匹配下驱动版本。把Driver改成MySQL for 5.1就可以了
+
+二、修改my.ini下的【mysqld】（永久解决）
+ 
+打开my.ini在【mysqld】下增加一句
+default-time_zone = ‘+8：00’
+ 
+保存退出后。重启MySQL服务。
+然后使用java程序即可连接mysql数据库。

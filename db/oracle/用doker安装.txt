@@ -1,0 +1,135 @@
+1.拉取Oracle11g镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+下载完成后，使用下列命令查看镜像
+docker images
+2.创建容器
+docker run -d -p 1521:1521 --name oracle11g registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+说明：如果没有添加1521，先添加1521端口
+3.启动容器
+docker start oracle11g
+4.进入镜像配置
+docker exec -it oracle11g bash
+5.配置Oracle环境变量
+切换到root用户
+用户名：root
+密码：helowin
+[root@a8a161b66e1d /]# vi /etc/profile
+在文件末未添加
+export ORACLE_HOME=/home/oracle/app/oracle/product/11.2.0/dbhome_2
+export ORACLE_SID=helowin
+export PATH=$ORACLE_HOME/bin:$PATH
+6.创建软链接
+ln -s $ORACLE_HOME/bin/sqlplus /usr/bin
+切换到iracle用户下（注意中间有-）
+su – oracle
+7.连接数据库
+[oracle@a8a161b66e1d ~]$ sqlplus /nolog
+SQL*Plus: Release 11.2.0.1.0 Production on Wed Oct 10 12:54:06 2018
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+SQL> conn / as sysdba
+Connected.
+SQL> alter user system identified by system;
+User altered.
+SQL> alter user sys identified by sys;
+User altered.
+SQL> create user ETS identified by ETS ;
+User created.
+SQL> grant connect,resource,dba to ETS ;
+Grant succeeded.
+8.配置本地tnsnames.ora文件
+复制代码
+LS =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 121.78.157.187)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+       (SERVER = DEDICATED)
+      (SERVICE_NAME = helowin)
+
+    )
+  )
+
+  
+  
+1521端口对外开放 将文件内 HOST = localhost 改为 HOST = 你的计算机名。重启监听服务。
+
+DROP USER user_name CASCADE;
+
+create user zxjgxtdb identified by zxjgxtdb
+
+grant create user,drop user,alter user,create any view,connect,resource,dba,create session,create any sequence to zxjgxtdb
+
+DROP USER hzjl CASCADE;
+create tablespace SHHZJL datafile '/home/oracle/app/oracle/oradata/helowin/hzjlbmh.dbf' size 100M;
+create user hzjl identified by gwinfo default tablespace SHHZJL;
+grant connect,resource,dba to hzjl;
+imp hzjl/gwinfo  file=/home/hzjl.dmp ignore=y full=y;
+DROP TABLESPACE SHHZJL  INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;
+
+DROP USER  TARGET2 cascade;
+create tablespace USERS datafile '/home/oracle/app/oracle/oradata/helowin/hzjlboa.dbf' size 100M;
+create user TARGET2 identified by nopwd default tablespace USERS;
+grant connect,resource,dba to TARGET2;
+imp TARGET2/nopwd  file=/home/hzjlb_2019_9_3.dmp ignore=y full=y;
+DROP TABLESPACE USERS  INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+30 IMP-00019: row rejected due to ORACLE error 12899
+IMP-00019: row rejected due to ORACLE error 12899
+IMP-00003: ORACLE error 12899 encountered
+ORA-12899: value too large for column "CRM"."BK_ECS_ORDER_INFO_00413"."POSTSCRIPT" (actual: 895, maximum: 765)导入日志报
+IMP-00019: 由于 ORACLE 错误 12899 而拒绝行
+IMP-00003: 遇到 ORACLE 错误 12899
+ORA-12899: 列 "JACKEYJ"."JK_REGISTER"."OPNAME" 的值太大 (实际值: 21, 最大值: 20)
+出现这种问题时因为生产库的字符集和本机测试库的字符集不一样。
+到生产库上用
+select userenv('language') from dual;
+查看到是ZHS16GBK，而本机库是utf-8用一下命令修改本机库字符集
+SQL>SHUTDOWN IMMEDIATE
+SQL>STARTUP MOUNT
+SQL>ALTER SYSTEM ENABLE RESTRICTED SESSION;
+SQL>ALTER SYSTEM SET JOB_QUEUE_PROCESSES=0;
+SQL>ALTER SYSTEM SET AQ_TM_PROCESSES=0;
+SQL>ALTER DATABASE OPEN
+SQL>ALTER DATABASE CHARACTER SET INTERNAL_USE ZHS16GBK;
+SQL>SHUTDOWN IMMEDIATE
+SQL>STARTUP
+设置后导入成功！
+还有注意一点就是建表空间和用户时要和生产库的表空间名称、数据文件名称、用户名、密码都要一致；
+
+
+
+
+
+ora-01033:oracle initialization or shutdown in progress；
+第二步、SQL>connect sys/change_on_install as sysdba
+提示：已成功
+第三步、SQL>shutdown normal
+提示：数据库已经关闭       已经卸载数据库       ORACLE 例程已经关闭
+第四步、SQL>startup mount
+第五步、SQL>alter database open;
+提示：（我在操作的时候没有遇到下边着中错误）
+第1 行出现错误: ORA-01157: 无法标识/锁定数据文件19 - 请参阅DBWR 跟踪文件
+ORA-01110: 数据文件19: ''''C:\oracle\oradata\oradb\FYGL.ORA''
+这个提示文件部分根据每个人不同情况有点差别。
+继续输入 第六步、SQL>alter database datafile 19 offline drop;
+第七、重复使用第五第六步，直到出现“数据库已更改”的提示，然后如下图，
+继续输入shutdown normal，startup mount就OK啦
+
+第二种方法：
+      把Oracle的相关服务都停止后、在重新启动、发现可以正常登录。
