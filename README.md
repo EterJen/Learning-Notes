@@ -18,3 +18,9 @@ cms https://180.169.77.202:8443/svn/G18001/01.开发库/05.编码/jyj
 ToDo:
 
 ajax请求封装，数据体默认值   有值才替换
+
+http://192.0.0.13:9999/svn/sww/
+
+http://192.0.0.13:8081/swwoa/manager/
+http://192.0.0.13:8081/sww/IndexAction.action
+数据库：192.0.0.208  SWWCMS   Gwideal1314          192.0.0.208   SWWOA   Gwideal1314  
