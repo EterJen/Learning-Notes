@@ -1,7 +1,0 @@
-# maven 环境变量添加
-export M2_HOME=/home/eter/workspace/devEnv/apache-maven-3.6.1
-export CLASSPATH=$CLASSPATH:$M2_HOME/lib
-export PATH=$PATH:$M2_HOME/bin
-
-# 安装jdk
-sudo apt-get install openjdk-8-jdk 
