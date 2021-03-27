@@ -94,8 +94,8 @@ sudo vi idea.desktop
 [Desktop Entry]
 Name=IntelliJ IDEA
 Comment=IntelliJ IDEA
-Exec=/usr/local/ideaIU/bin/idea.sh
-Icon=/usr/local/ideaIU/bin/idea.png
+Exec=/home/eter/workspace/devEnv/idea-IU-203.7717.32/bin/idea.sh
+Icon=/home/eter/workspace/devEnv/idea-IU-203.7717.32/idea.png
 Terminal=false
 Type=Application
 Categories=Developer;
